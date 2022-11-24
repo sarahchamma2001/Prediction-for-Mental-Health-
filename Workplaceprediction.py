@@ -3,6 +3,16 @@ import pandas as pd
 import numpy as np
 import requests
 from streamlit_lottie import st_lottie
+import hydralit_components as hc
+from streamlit_option_menu import option_menu
+from PIL import Image
+import joblib
+import sklearn
+import statsmodels.api as sm
+import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import FunctionTransformer
+from sklearn.preprocessing import MinMaxScaler
 # Display lottie animations
 def load_lottieurl(url):
 
@@ -23,8 +33,6 @@ t1, t2 = st.columns((0.4,1))
 t2.title("Mental Health & Well-being")
 
 #Hydralit Navbar
-import hydralit_components as hc
-from streamlit_option_menu import option_menu
 # define what option labels and icons to display
 Menu = option_menu(None, ["Home", "Prediction"], icons=['house',"bar-chart-line","clipboard-check"],
 menu_icon="cast", default_index=0, orientation="horizontal", 
@@ -33,7 +41,6 @@ styles={"container": {"padding": "0!important", "background-color": "#fafafa"},"
 if Menu == "Home":
       # Display Introduction
 #Upload Image
-    from PIL import Image
     image=Image.open('mental health.jpg')
     title_container = st.container()
     col1, mid, col2 = st.columns([1,4,1])
@@ -47,15 +54,6 @@ if Menu == "Home":
 
 
 df=pd.read_csv("output.csv")
-# Machine Learning Application
-# Import necessary librariries
-import joblib
-import sklearn
-import statsmodels.api as sm
-import pickle
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import FunctionTransformer
-from sklearn.preprocessing import MinMaxScaler
 # Machine Learning Application
 if Menu == "Prediction":
 
