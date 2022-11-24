@@ -1,20 +1,8 @@
-import profile
-from matplotlib.pyplot import title
 import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
-import inspect
 from streamlit_lottie import st_lottie
-from pandas_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
-from numerize import numerize
-from itertools import chain
-import plotly.graph_objects as go
-import plotly.express as px
-import joblib
-import sklearn
-import statsmodels.api as sm
 # Display lottie animations
 def load_lottieurl(url):
 
@@ -25,9 +13,6 @@ def load_lottieurl(url):
         return None
     return r.json()
 # Extract Lottie Animations
-
-lottie_home = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json")
-lottie_dataset = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_grpcjnlf.json")
 lottie_prediction= load_lottieurl("https://assets4.lottiefiles.com/private_files/lf30_ghysqmiq.json")
 
 #Title
