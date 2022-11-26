@@ -1,20 +1,8 @@
-import profile
-from matplotlib.pyplot import title
 import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
-import inspect
 from streamlit_lottie import st_lottie
-from pandas_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
-from numerize import numerize
-from itertools import chain
-import plotly.graph_objects as go
-import plotly.express as px
-import joblib
-import sklearn
-import statsmodels.api as sm
 # Display lottie animations
 def load_lottieurl(url):
 
@@ -25,9 +13,6 @@ def load_lottieurl(url):
         return None
     return r.json()
 # Extract Lottie Animations
-
-lottie_home = load_lottieurl("https://assets3.lottiefiles.com/packages/lf20_tijmpky4.json")
-lottie_dataset = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_grpcjnlf.json")
 lottie_prediction= load_lottieurl("https://assets4.lottiefiles.com/private_files/lf30_ghysqmiq.json")
 
 #Title
@@ -41,7 +26,7 @@ t2.title("Mental Health & Well-being")
 import hydralit_components as hc
 from streamlit_option_menu import option_menu
 # define what option labels and icons to display
-Menu = option_menu(None, ["Home",  "EDA", "Prediction"], icons=['house',"bar-chart-line","clipboard-check"],
+Menu = option_menu(None, ["Home", "Prediction"], icons=['house',"bar-chart-line","clipboard-check"],
 menu_icon="cast", default_index=0, orientation="horizontal", 
 styles={"container": {"padding": "0!important", "background-color": "#fafafa"},"icon": {"color": "black", "font-size": "25px"}, "nav-link": {"font-size": "15px", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},"nav-link-selected": {"background-color": "#4F6272"},})
 # Home Page
@@ -60,249 +45,8 @@ if Menu == "Home":
       with mid1:
         st.write('Without effective support, mental disorders and other mental health conditions can affect a person confidence and identity at work, capacity to work productively, absences and the ease with which to retain or gain work.')
 
-# EDA page
+
 df=pd.read_csv("output.csv")
-if Menu == "EDA":
-  st.header("Visualizations")
-  m1, m2, m3, m4, m5, m6 = st.columns((1,1,1,1,1,1))
-  m1.metric(label="Number of employees", value ="1237")
-  m2.metric(label="Treatment", value ="624")
-  m3.metric(label="Family History", value ="483")
-  m4.metric(label="Care Options", value ="436")
-  m5.metric(label="Welness Program", value ="228")
-  m6.metric(label="Benefits", value ="467")
-#Visualization
-  g1,g2= st.columns((1,2))
-  k1,k2=st.columns((3,1))
-  import plotly.express as px
-  import plotly.graph_objects as go
-  import chart_studio.plotly as py
-  import seaborn as sns
-  from plotly.subplots import make_subplots
-  import matplotlib.pyplot as plt
-
-#visualization of categorical variables
-
-  df_ = df.drop(['Age', 'Country'], axis=1)
-
-  buttons = []
-  i = 0
-  vis = [False] * 24
-
-  for col in df_.columns:
-      vis[i] = True
-      buttons.append({'label' : col,
-               'method' : 'update',
-               'args'   : [{'visible' : vis},
-               {'title'  : col}] })
-      i+=1
-      vis = [False] * 24
-
-  fig = go.Figure()
-
-  for col in df_.columns:
-      fig.add_trace(go.Pie(
-               values = df_[col].value_counts(),
-               labels = df_[col].value_counts().index,
-               title = dict(text = 'Distribution of {}'.format(col),
-                            font = dict(size=18, family = 'monospace'),
-                            ),
-               hole = 0.5,
-               hoverinfo='label+percent',))
-
-  fig.update_traces(hoverinfo='label+percent',
-                    textinfo='label+percent',
-                    textfont_size=15,
-                    opacity = 0.8,
-                    showlegend = False,
-                    marker = dict(colors = ['#4F6272', '#B7C3F3','#A7C3F6'] ,
-                                line=dict(color='#4F6272', width=1)))
-              
-
-  fig.update_layout(margin=dict(t=0, b=0, l=0, r=0),
-                    updatemenus = [dict(
-                          type = 'dropdown',
-                          x = 1.15,
-                          y = 0.9,
-                          showactive = True,
-                          active = 0,
-                          buttons = buttons)],
-                   annotations=[
-                               dict(text = "<b>Choose<br>Column<b> : ",
-                               showarrow=False,
-                               x = 1.02, y = 0.99, yref = "paper", align = "left")])
-  for i in range(1,22):
-      fig.data[i].visible = False
-  g1.plotly_chart(fig, use_container_width=True) 
-
-# visualization of non-categorical variables
-  fig = make_subplots(rows = 1, cols=2)
-  fig.append_trace(go.Bar(
-                          y = df['Country'].value_counts(),
-                          x = df['Country'].value_counts().index,
-                          name = 'Observations from Countries ',
-                          text = df['Country'].value_counts(),
-                          textfont = dict(size = 12,
-                                          family = 'monospace'),
-                          textposition = 'outside',
-                          marker=dict(color="#4F6272")
-                          ), row=1, col=1)
-
-  fig.append_trace(go.Histogram(
-                          x = df['Age'],
-                          nbinsx = 8,
-                          text = ['16', '500', '562', '149', '26', '5', '1'],
-                          marker =  dict(color="#B7C3F3")),
-                          row=1, col=2)
-# For Subplot : 1
-
-  #fig.update_xaxes(
-          #row=1, col=1,
-          #tickfont = dict(size=10, family = 'monospace'),
-          #tickmode = 'array',
-          #ticktext = df['Country'].value_counts().index,
-          #tickangle = 50,
-          #ticklen = 8,
-          #showline = False,
-          #showgrid = False,
-          #ticks = 'outside')
-
-     #fig.update_yaxes(type = 'log',
-         # row=1, col=1,
-          #tickfont = dict(size=15, family = 'monospace'),
-          #tickmode = 'array',
-          #showline = False,
-          #showgrid = False,
-          #ticks = 'outside')
-  #fig.update_traces(
-                    #marker_line_color='black',
-                    #marker_line_width= 1.2,
-                    #opacity=0,
-                    # row = 1, col = 1)
-
-  #fig.update_xaxes(range=[-1,10], row = 1, col = 1)
-
-# For Subplot : 2
-
-  fig.update_xaxes(        
-          title = dict(text = 'Age',
-                       font = dict(size = 13,
-                                   family = 'monospace')),
-          row=1, col=2,
-          tickfont = dict(size=15, family = 'monospace', color = 'black'),
-          tickmode = 'array',
-          ticktext = ['10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79'],
-          ticklen = 6,
-          showline = False,
-          showgrid = False,
-          ticks = 'outside')
-
-  fig.update_yaxes(
-          row=1, col=2,
-          tickfont = dict(size=15, family = 'monospace'),
-          tickmode = 'array',
-          showline = False,
-          showgrid = False,
-          ticks = 'outside')
-
-  fig.update_traces(
-                    marker_line_color='black',
-                    marker_line_width = 2,
-                    opacity = 0.6,
-                    row = 1, col = 2)
-
-
-  fig.update_layout(height=500, width=900,
-                    title = dict(text = 'Visualization of non-categorical variables<br>1. Observation from Countries<br>2. Ages Count',
-                                 x = 0.5,
-                                 font = dict(size = 16, color ='#27302a',
-                                 family = 'monospace')),
-                    showlegend = False)
-  g2.plotly_chart(fig, use_container_width=True) 
-
-
-#Results
-  cw1, cw2 = st.columns((5, 0.5))
-  seek = df[df.treatment == 'Yes'].drop(['treatment', 'Country', 'Age'], axis=1)
-  dont = df[df.treatment == 'No'].drop(['treatment', 'Country', 'Age'], axis=1)
-  buttons = []
-  i = 0
-  vis = [False] * 21
-
-  for col in seek.columns:
-      vis[i] = True
-      buttons.append({'label' : col,
-               'method' : 'update',
-               'args'   : [{'visible' : vis},
-               {'title'  : col}] })
-      i+=1
-      vis = [False] * 21
-
-  fig = make_subplots(rows=1, cols=2,
-                specs=[[{'type':'domain'}, {'type':'domain'}]])
-
-  for col in dont.columns:
-      fig.add_trace(go.Pie(
-               values = dont[col].value_counts(),
-               labels = dont[col].value_counts().index,
-               title = dict(text = 'No Treatment: <br>Distribution<br>of {}'.format(col),
-                            font = dict(size=18, family = 'monospace'),
-                            ),
-               hole = 0.5,
-               hoverinfo='label+percent',),1,1)
-  for col in seek.columns:
-      fig.add_trace(go.Pie(
-               values = seek[col].value_counts(),
-               labels = seek[col].value_counts().index,
-               title = dict(text = 'Seek Treatment: <br>Distribution<br>of {}'.format(col),
-                            font = dict(size=18, family = 'monospace'),
-                            ),
-               hole = 0.5,
-               hoverinfo='label+percent',),1,2)
-
-  fig.update_traces(hoverinfo='label+percent',
-                    textinfo='label+percent',
-                    textfont_size=15,
-                    opacity = 0.8,
-                    showlegend = False,
-                    marker = dict(colors = ['#4F6272', '#B7C3F3', '#DD7596', '#8EB897', '#A7C3F6'] ,
-                                line=dict(color='#4F6272', width=1)))
-
-  fig.update_traces(row=1, col=2, hoverinfo='label+percent',
-                    textinfo='label+percent',
-                    textfont_size=15,
-                    opacity = 0.8,
-                    showlegend = False,
-                    marker = dict(colors = ['#4F6272', '#B7C3F3', '#DD7596', '#8EB897', '#A7C3F6'] ,
-                                line=dict(color='#4F6272', width=1)))
-
-  fig.update_layout(margin=dict(t=0, b=0, l=0, r=0),
-                  font_family   = 'monospace',
-                  height=300, width=600,
-                  updatemenus = [dict(
-                          type = 'dropdown',
-                          x = 0.60,
-                          y = 0.70,
-                          showactive = True,
-                          active = 0,
-                          buttons = buttons)],
-                  annotations=[
-                               dict(text = "<b>Choose<br>Column<b> : ",
-                                    font = dict(size = 14),
-                               showarrow=False,
-                               x = 0.5, y = 0.90, yref = "paper", align = "left")])
-  fig.update_layout(height=400, width=800,
-                    title = dict(text = '<br>How did employees respond to questions whether<br>they received treatment or not?',
-                                 x = 0.5,
-                                 font = dict(size = 16, color ='#27302a',
-                                 family = 'monospace')),
-                    showlegend = False)
-  for i in range(1,42): 
-      fig.data[i].visible = False
-  fig.data[21].visible = True
-  cw1.plotly_chart(fig, use_container_width=True)  
-
-
 # Machine Learning Application
 # Import necessary librariries
 import joblib
@@ -321,7 +65,6 @@ if Menu == "Prediction":
     with col[0]:
         st.markdown("""
         <h3 class="f2 f1-m f-headline-l measure-narrow lh-title mv0">
-        Know The Risks
          </h3>
          <p class="f5 f4-ns lh-copy measure mb4" style="text-align: justify;font-family: Sans Serif">
         It's time to assess if any employee may seek medical attention. 
@@ -537,4 +280,3 @@ if Menu == "Prediction":
                      st.markdown("""<h3 style="color:#00284c;font-size:35px;">
                         Need a treatment
                          </h3>""",unsafe_allow_html = True)
-
